@@ -771,6 +771,7 @@
         }
 
         loveButton.addEventListener('click', function(e) {
+            haptic();
             const rect = this.getBoundingClientRect();
             const x = rect.left + rect.width / 2;
             const y = rect.top + rect.height / 2;
@@ -821,6 +822,7 @@
         let heartSpeed = 1;
 
         heartBtn.addEventListener('click', function() {
+            haptic();
             // Pulse wave
             const pw = heartPulse.cloneNode();
             pw.classList.add('animate');
@@ -877,6 +879,7 @@
             `;
 
             card.addEventListener('click', function() {
+                haptic();
                 this.classList.toggle('revealed');
                 if (this.classList.contains('revealed')) {
                     const rect = this.getBoundingClientRect();
@@ -924,25 +927,11 @@
         const TOTAL_PETALS = 10;
         const loveMsgs = ['تحبني 💕', 'ما تحبني 💔'];
 
-        function playSoftPop() {
-            try {
-                const ac = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ac.createOscillator();
-                const gain = ac.createGain();
-                osc.connect(gain).connect(ac.destination);
-                osc.frequency.setValueAtTime(500, ac.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(350, ac.currentTime + 0.08);
-                gain.gain.setValueAtTime(0.05, ac.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.08);
-                osc.start();
-                osc.stop(ac.currentTime + 0.08);
-                setTimeout(() => ac.close(), 150);
-            } catch(e) {}
-            try { navigator.vibrate(15); } catch(e) {}
-        }
+        function haptic() { try { navigator.vibrate(12); } catch(e) {} }
 
         roseEmoji.addEventListener('click', function() {
             if (petalCount >= TOTAL_PETALS) return;
+            haptic();
             playSoftPop();
 
             this.classList.remove('pop');
@@ -992,6 +981,7 @@
         // ══════════════════════════════════════════════
         document.querySelectorAll('.letter-header').forEach(h => {
             h.addEventListener('click', function() {
+                haptic();
                 const card = this.closest('.letter-card');
                 card.classList.toggle('open');
             });
