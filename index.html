@@ -309,6 +309,38 @@
         #youtubePlayer iframe { width: 100%; height: 315px; border: none; }
         #youtubePlayer.show { display: block; }
 
+        /* ── LETTERS ACCORDION ── */
+        #letters { max-width: 600px; margin: 0 auto; padding: 40px 10px; }
+        .letter-card {
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+            border-radius: 20px; margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            overflow: hidden; transition: all 0.3s;
+        }
+        .letter-card:hover { border-color: rgba(255,255,255,0.3); }
+        .letter-header {
+            display: flex; align-items: center; gap: 12px;
+            padding: 18px 20px; cursor: pointer; user-select: none;
+            -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+            transition: background 0.3s;
+        }
+        .letter-header:active { background: rgba(255,255,255,0.05); }
+        .letter-emoji { font-size: 1.5rem; flex-shrink: 0; }
+        .letter-title { font-size: 1.05rem; font-weight: 600; flex: 1; }
+        .letter-toggle {
+            font-size: 1.3rem; font-weight: 300; transition: transform 0.3s;
+            flex-shrink: 0; opacity: 0.6;
+        }
+        .letter-card.open .letter-toggle { transform: rotate(45deg); }
+        .letter-body {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            padding: 0 20px; line-height: 1.8; font-size: 0.95rem; opacity: 0.9;
+        }
+        .letter-card.open .letter-body {
+            max-height: 400px; padding: 0 20px 20px;
+        }
+
         /* ── MUSIC NOTE ── */
         .music-note {
             position: fixed; bottom: 25px; left: 25px; z-index: 50;
@@ -429,6 +461,47 @@
             <div class="rose-emoji" id="roseEmoji">🌹</div>
             <div class="qtf-text" id="qtfText"></div>
             <div class="rose-msg" id="roseMessage">🌹 أنتي أحلى وردة في حياتي</div>
+        </section>
+
+        <!-- ─── LETTERS ─── -->
+        <section id="letters" class="reveal">
+            <div class="section-title reveal reveal-delay-1">💌</div>
+
+            <div class="letter-card reveal reveal-delay-2">
+                <div class="letter-header">
+                    <span class="letter-emoji">❤️</span>
+                    <span class="letter-title">افتحيها لما تشتاقيلي</span>
+                    <span class="letter-toggle">+</span>
+                </div>
+                <div class="letter-body">إذا اشتقتيلي، تذكري إني مشتاقة إلك كمان، حتى لو بينا مسافات. يمكن ما التقينا لسه، بس وجودك بحياتي صار جزء من أيامي، وكل يوم بقربنا أكتر من اليوم اللي رح أشوفك فيه. بحبك، وأنا هون إلك دايماً. 💕</div>
+            </div>
+
+            <div class="letter-card reveal reveal-delay-3">
+                <div class="letter-header">
+                    <span class="letter-emoji">🤍</span>
+                    <span class="letter-title">افتحيها لما تكوني زعلانة</span>
+                    <span class="letter-toggle">+</span>
+                </div>
+                <div class="letter-body">ما بحب شوفك زعلانة، بدي تعرفي إنك مو لحالك. خدي وقتك، وارتاحي، وأنا رح ضل جنبك وأسمعك. الأيام الصعبة بتمرق، وأنتي أقوى مما بتتصوري. 🌷</div>
+            </div>
+
+            <div class="letter-card reveal reveal-delay-4">
+                <div class="letter-header">
+                    <span class="letter-emoji">🌷</span>
+                    <span class="letter-title">افتحيها لما تحتاجي حافز</span>
+                    <span class="letter-toggle">+</span>
+                </div>
+                <div class="letter-body">أنا فخور فيكي، وبكل خطوة بتعمليها، حتى لو كانت صغيرة. ما لازم تكوني كاملة، المهم تكملي. عندك أحلام حلوة، وعندي ثقة إنك رح توصليلها. وإذا تعبتي، ارتاحي شوي، بس لا تستسلمي. ✨</div>
+            </div>
+
+            <div class="letter-card reveal reveal-delay-5">
+                <div class="letter-header">
+                    <span class="letter-emoji">😂</span>
+                    <span class="letter-title">افتحيها لما تحتاجي ضحكة</span>
+                    <span class="letter-toggle">+</span>
+                </div>
+                <div class="letter-body">إذا فتحتي هاي الرسالة، فهاي مهمة رسمية: ابتسمي شوي 😌. وتذكري إن في حدا بالعالم بيفكر فيكي وبيحب ضحكتك أكتر من أي شي. ❤️</div>
+            </div>
         </section>
 
         <!-- ─── MUSIC ─── -->
@@ -651,297 +724,17 @@
         });
 
         // ══════════════════════════════════════════════
-        // 5. LOVE BUTTON
+        // 12. LETTERS ACCORDION
         // ══════════════════════════════════════════════
-        const loveButton = document.getElementById('loveButton');
-        const loveCounter = document.getElementById('loveCounter');
-        const loveMessage = document.getElementById('loveMessage');
-        let clickCount = 0;
-        const TOTAL_LOVE = 10;
-        const messages = [
-            'بحبك 💕','بحبك كتير 💖','عشقي الأبدي 💗','بحبك قد الدنيا 💓','بحبك قد السما 💞',
-            'بحبك قد كلشي 💝','بحبك للابد ❤️','بحبك كتير كتير 💘','بحبك بجنون 💟','بحبك قد الكون كله 👑❤️',
-        ];
-
-        function renderCounter() {
-            loveCounter.innerHTML = '';
-            for (let i = 0; i < TOTAL_LOVE; i++) {
-                const span = document.createElement('span');
-                span.className = 'heart-icon';
-                span.textContent = '❤️';
-                if (i < clickCount) span.classList.add('filled');
-                else span.classList.add('empty');
-                loveCounter.appendChild(span);
-            }
-            const msgIndex = Math.min(clickCount - 1, messages.length - 1);
-            loveMessage.textContent = clickCount > 0 ? messages[msgIndex] : '';
-            if (clickCount >= TOTAL_LOVE) loveMessage.textContent = 'بموت فيكي 🥹❤️👑';
-        }
-
-        function burstHearts(x, y) {
-            const emojis = ['❤️','🖤','👑','💕','💖','💗','💓','💞','💝','💘','💟','🩷'];
-            const count = 30 + Math.random() * 30;
-            for (let i = 0; i < count; i++) {
-                const el = document.createElement('div');
-                el.className = 'burst-heart';
-                el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                el.style.left = x + 'px'; el.style.top = y + 'px';
-                const angle = Math.random() * Math.PI * 2;
-                const distance = 100 + Math.random() * 200;
-                el.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
-                el.style.setProperty('--ty', Math.sin(angle) * distance - 100 + 'px');
-                el.style.setProperty('--tr', (Math.random() - 0.5) * 720 + 'deg');
-                el.style.fontSize = (0.8 + Math.random() * 1.5) + 'rem';
-                document.body.appendChild(el);
-                setTimeout(() => el.remove(), 1200);
-            }
-        }
-
-        loveButton.addEventListener('click', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = rect.left + rect.width / 2;
-            const y = rect.top + rect.height / 2;
-            clickCount = Math.min(clickCount + 1, TOTAL_LOVE);
-            renderCounter();
-            burstHearts(x, y);
-            const flash = document.createElement('div');
-            flash.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,45,85,0.15);pointer-events:none;z-index:99;animation:flashFade 0.5s ease forwards;';
-            document.body.appendChild(flash);
-            setTimeout(() => flash.remove(), 500);
-        });
-
-        // ══════════════════════════════════════════════
-        // 6. DATE / DISTANCE / COUNTDOWN
-        // ══════════════════════════════════════════════
-        function updateDateCounter() {
-            const start = new Date('2022-07-11T00:00:00');
-            const now = new Date();
-            document.getElementById('daysCount').textContent = Math.floor((now - start) / (1000*60*60*24)).toLocaleString('en-US');
-        }
-        updateDateCounter();
-        setInterval(updateDateCounter, 1000*60*60);
-
-        function calcDistance() {
-            const toRad = (d) => d * Math.PI / 180;
-            const R = 6371, dLat = toRad(34.1959-25.2854), dLon = toRad(43.8793-51.5310);
-            const a = Math.sin(dLat/2)**2 + Math.cos(toRad(25.2854))*Math.cos(toRad(34.1959))*Math.sin(dLon/2)**2;
-            document.getElementById('distKm').textContent = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toLocaleString('en-US');
-        }
-        calcDistance();
-
-        function updateCountdown() {
-            const diff = Math.max(0, Math.ceil((new Date('2026-10-01') - new Date()) / (1000*60*60*24)));
-            document.getElementById('cdDays').textContent = diff.toLocaleString('en-US');
-        }
-        updateCountdown();
-        setInterval(updateCountdown, 1000*60*60);
-        renderCounter();
-
-        // ══════════════════════════════════════════════
-        // 7. HEARTBEAT
-        // ══════════════════════════════════════════════
-        const heartBtn = document.getElementById('heartBeatBtn');
-        const heartPulse = document.getElementById('heartPulse');
-        const heartEcgPath = document.querySelector('#heartEcg path');
-        const heartText = document.getElementById('heartText');
-        let bpm = 72;
-        let heartSpeed = 1;
-
-        heartBtn.addEventListener('click', function() {
-            // Pulse wave
-            const pw = heartPulse.cloneNode();
-            pw.classList.add('animate');
-            document.getElementById('heartbeat').appendChild(pw);
-            setTimeout(() => pw.remove(), 1000);
-
-            // ECG draw
-            heartEcgPath.classList.remove('draw');
-            void heartEcgPath.offsetWidth;
-            heartEcgPath.classList.add('draw');
-
-            // Faster with each press
-            heartSpeed = Math.max(0.2, heartSpeed - 0.08);
-            this.style.animationDuration = heartSpeed + 's';
-
-            // BPM effect
-            bpm = Math.min(200, Math.floor(72 + (1 / heartSpeed) * 20));
-            const msgs = [
-                `🫀 مع كل ضغطة قلبي بدق بحبك — ${bpm} BPM`,
-                `💓 كل ضغطة بتقول بحبك ${bpm} BPM`,
-                `🖤 قلبي ما بيدق إلا لالك ${bpm} BPM`,
-            ];
-            heartText.innerHTML = msgs[Math.floor(Math.random() * msgs.length)];
-        });
-
-        // ══════════════════════════════════════════════
-        // 8. REASONS CARDS
-        // ══════════════════════════════════════════════
-        const reasons = [
-            'عيونك الحلوة اللي بغرق فيهم كل ما شفتك',
-            'ضحكتك اللي بتخليني أنسى هموم الدنيا كلها',
-            'قلبك الطيب اللي ما في زيّه',
-            'حنانك اللي بخليني أحس إنّي بأمان',
-            'طريقة كلامك الحلوة اللي بتسرق قلبي',
-            'خلّيتيني إنسان أحسن',
-            'صبرك عليّ وفهمك ليّ دايمًا',
-            'كل شي فيك... أنتي ببساطة كل حياتي',
-            'إنك دايماً بجنبي مهما صار',
-            'طيبة قلبك وحبك الصادق',
-        ];
-
-        const grid = document.getElementById('reasonsGrid');
-
-        reasons.forEach((reason, i) => {
-            const card = document.createElement('div');
-            card.className = 'reason-card';
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = `opacity 0.5s ease ${0.1 + i * 0.08}s, transform 0.5s ease ${0.1 + i * 0.08}s`;
-
-            card.innerHTML = `
-                <div class="front"><span class="number">${i + 1}</span>سبب حب</div>
-                <div class="back">${reason}</div>
-            `;
-
-            card.addEventListener('click', function() {
-                this.classList.toggle('revealed');
-                if (this.classList.contains('revealed')) {
-                    const rect = this.getBoundingClientRect();
-                    const cx = rect.left + rect.width / 2;
-                    const cy = rect.top + rect.height / 2;
-                    for (let j = 0; j < 8; j++) {
-                        const el = document.createElement('div');
-                        el.className = 'burst-heart';
-                        el.textContent = '💖';
-                        el.style.left = cx + 'px'; el.style.top = cy + 'px';
-                        const angle = Math.random() * Math.PI * 2;
-                        const dist = 40 + Math.random() * 60;
-                        el.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
-                        el.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
-                        el.style.setProperty('--tr', (Math.random() - 0.5) * 360 + 'deg');
-                        el.style.fontSize = '0.8rem';
-                        document.body.appendChild(el);
-                        setTimeout(() => el.remove(), 1200);
-                    }
-                }
+        document.querySelectorAll('.letter-header').forEach(h => {
+            h.addEventListener('click', function() {
+                const card = this.closest('.letter-card');
+                card.classList.toggle('open');
             });
-            grid.appendChild(card);
-        });
-
-        const reasonsObserver = new IntersectionObserver((entries) => {
-            for (const entry of entries) {
-                if (entry.isIntersecting) {
-                    entry.target.querySelectorAll('.reason-card').forEach((c) => {
-                        c.style.opacity = '1'; c.style.transform = 'translateY(0)';
-                    });
-                    reasonsObserver.unobserve(entry.target);
-                }
-            }
-        }, { threshold: 0.2 });
-        reasonsObserver.observe(document.getElementById('reasons'));
-
-        // ══════════════════════════════════════════════
-        // 9. ROSE
-        // ══════════════════════════════════════════════
-        const roseEmoji = document.getElementById('roseEmoji');
-        const roseStatus = document.getElementById('roseStatus');
-        const roseMessage = document.getElementById('roseMessage');
-        const qtfText = document.getElementById('qtfText');
-        let petalCount = 0;
-        const TOTAL_PETALS = 10;
-        const loveMsgs = ['تحبني 💕', 'ما تحبني 💔'];
-
-        function playSoftPop() {
-            try {
-                const ac = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ac.createOscillator();
-                const gain = ac.createGain();
-                osc.connect(gain).connect(ac.destination);
-                osc.frequency.setValueAtTime(500, ac.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(350, ac.currentTime + 0.08);
-                gain.gain.setValueAtTime(0.05, ac.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.08);
-                osc.start();
-                osc.stop(ac.currentTime + 0.08);
-                setTimeout(() => ac.close(), 150);
-            } catch(e) {}
-            try { navigator.vibrate(15); } catch(e) {}
-        }
-
-        roseEmoji.addEventListener('click', function() {
-            if (petalCount >= TOTAL_PETALS) return;
-            playSoftPop();
-
-            this.classList.remove('pop');
-            void this.offsetWidth;
-            this.classList.add('pop');
-
-            const remaining = TOTAL_PETALS - petalCount - 1;
-            if (remaining > 0) {
-                const msgIdx = petalCount % 2;
-                qtfText.textContent = loveMsgs[msgIdx];
-                qtfText.style.color = msgIdx === 0 ? '#ff4757' : '#666';
-                roseStatus.textContent = `🌹 متبقي ${remaining}`;
-            } else {
-                qtfText.textContent = 'تحبني 💕❤️';
-                qtfText.style.color = '#ff4757';
-                roseStatus.textContent = '🌹 هااااا طلعتي بتحبيني 🌚❤️';
-                roseMessage.classList.add('show');
-                this.classList.add('fade');
-                // Celebration
-                const rect = this.getBoundingClientRect();
-                const cx = rect.left + rect.width / 2;
-                const cy = rect.top + rect.height / 2;
-                for (let b = 0; b < 5; b++) {
-                    setTimeout(() => {
-                        for (let k = 0; k < 25; k++) {
-                            const el = document.createElement('div');
-                            el.className = 'burst-heart';
-                            el.textContent = ['❤️','💕','💖','🖤','👑','💗','💓','💞'][Math.floor(Math.random() * 8)];
-                            el.style.left = cx + 'px'; el.style.top = cy + 'px';
-                            const angle = Math.random() * Math.PI * 2;
-                            const dist = 80 + Math.random() * 200;
-                            el.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
-                            el.style.setProperty('--ty', Math.sin(angle) * dist - 100 + 'px');
-                            el.style.setProperty('--tr', (Math.random() - 0.5) * 720 + 'deg');
-                            el.style.fontSize = (0.8 + Math.random() * 1.5) + 'rem';
-                            document.body.appendChild(el);
-                            setTimeout(() => el.remove(), 1200);
-                        }
-                    }, b * 250);
-                }
-            }
-            petalCount++;
         });
 
         // ══════════════════════════════════════════════
-        // 11. MUSIC
-        // ══════════════════════════════════════════════
-        const musicBtn = document.getElementById('musicBtn');
-        const youtubePlayer = document.getElementById('youtubePlayer');
-        const musicNote = document.getElementById('musicNote');
-        let musicPlaying = false;
-
-        function toggleMusic() {
-            musicPlaying = !musicPlaying;
-            if (musicPlaying) {
-                youtubePlayer.classList.add('show');
-                musicBtn.textContent = '⏸ إخفاء الأغنية';
-                musicBtn.classList.add('playing');
-                musicNote.classList.add('playing');
-            } else {
-                youtubePlayer.classList.remove('show');
-                musicBtn.textContent = '🎵 شغّل أغنيتنا';
-                musicBtn.classList.remove('playing');
-                musicNote.classList.remove('playing');
-            }
-        }
-
-        musicBtn.addEventListener('click', toggleMusic);
-        musicNote.addEventListener('click', toggleMusic);
-
-        // ══════════════════════════════════════════════
-        // 12. PASSWORD
+        // 13. PASSWORD
         // ══════════════════════════════════════════════
         const PASSWORD = 'mmdmj';
         const overlay = document.getElementById('passwordOverlay');
