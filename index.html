@@ -106,7 +106,7 @@
             background: rgba(255,255,255,0.08); backdrop-filter: blur(8px);
             border-radius: 30px; border: 1px solid rgba(255,255,255,0.15);
         }
-        .dt-title, .ds-title, .cd-title, .hb-title, .rose-title, .puzzle-title {
+        .dt-title, .ds-title, .cd-title, .hb-title, .rose-title {
             font-size: clamp(1.5rem,4vw,2rem); font-weight: 700; margin-bottom: 12px; text-shadow: 0 2px 15px rgba(0,0,0,0.2);
         }
         .dt-sub { font-size: clamp(0.95rem,2.5vw,1.15rem); opacity: 0.85; margin-bottom: 20px; }
@@ -258,44 +258,6 @@
         .reason-card.revealed { background: rgba(255,255,255,0.3); border-color: rgba(255,255,255,0.5); }
         @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
 
-        /* ── LOVE PUZZLE ── */
-        #love-puzzle {
-            text-align: center; padding: 40px 20px; margin: 20px 0;
-            background: rgba(255,255,255,0.08); backdrop-filter: blur(8px);
-            border-radius: 30px; border: 1px solid rgba(255,255,255,0.15);
-        }
-        .puzzle-grid {
-            display: grid; grid-template-columns: repeat(3,1fr);
-            gap: 8px; max-width: 280px; margin: 20px auto; direction: ltr;
-        }
-        .puzzle-tile {
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; font-weight: 900; border-radius: 15px;
-            background: rgba(255,255,255,0.15); cursor: pointer; user-select: none;
-            transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.2);
-            -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-        }
-        .puzzle-tile:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
-        .puzzle-tile.empty { opacity: 0; pointer-events: none; }
-        .puzzle-tile.correct { border-color: #ff4757; box-shadow: 0 0 15px rgba(255,45,85,0.3); }
-        .puzzle-status {
-            font-size: 0.95rem; opacity: 0.8; margin-bottom: 10px; min-height: 1.5em;
-        }
-        .puzzle-message {
-            font-size: 1.3rem; font-weight: 700; min-height: 2em;
-            margin-top: 10px; opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        .puzzle-message.show { opacity: 1; }
-        .puzzle-reset {
-            font-family: 'Cairo', sans-serif; font-size: 0.9rem; font-weight: 600;
-            padding: 8px 20px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 30px; background: rgba(255,255,255,0.1); color: #fff;
-            cursor: pointer; transition: all 0.3s;
-            -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-        }
-        .puzzle-reset:hover { background: rgba(255,255,255,0.2); }
-
         /* ── ROSE ── */
         #rose {
             text-align: center; padding: 50px 20px; margin: 20px 0;
@@ -384,13 +346,10 @@
             #love-letter { padding: 25px 18px; }
             #youtubePlayer iframe { height: 200px; }
             #loveButton { width: 90%; padding: 16px 20px; }
-            .puzzle-grid { max-width: 220px; }
-            .puzzle-tile { font-size: 1.5rem; }
         }
         @media (max-width: 360px) {
             .reasons-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
             .reason-card { min-height: 80px; padding: 12px 8px; }
-            .puzzle-grid { max-width: 180px; gap: 5px; }
         }
     </style>
 </head>
@@ -473,15 +432,6 @@
         <section id="reasons" class="reveal">
             <div class="section-title reveal reveal-delay-1">✨ أسباب بحبك فيها ✨</div>
             <div class="reasons-grid" id="reasonsGrid"></div>
-        </section>
-
-        <!-- ─── LOVE PUZZLE ─── -->
-        <section id="love-puzzle" class="reveal">
-            <div class="puzzle-title reveal reveal-delay-1">🧩 فك اللغز 🧩</div>
-            <div class="puzzle-status reveal reveal-delay-2" id="puzzleStatus">رتب الأرقام من 1 لـ 8</div>
-            <div class="puzzle-grid reveal reveal-delay-2" id="puzzleGrid"></div>
-            <div class="puzzle-message" id="puzzleMessage">🎉 بحبك يا مروجتي 🎉</div>
-            <button class="puzzle-reset reveal reveal-delay-3" id="puzzleReset">🔄 ابدا من جديد</button>
         </section>
 
         <!-- ─── ROSE ─── -->
@@ -912,109 +862,7 @@
         reasonsObserver.observe(document.getElementById('reasons'));
 
         // ══════════════════════════════════════════════
-        // 9. LOVE PUZZLE
-        // ══════════════════════════════════════════════
-        const puzzleGrid = document.getElementById('puzzleGrid');
-        const puzzleStatus = document.getElementById('puzzleStatus');
-        const puzzleMessage = document.getElementById('puzzleMessage');
-        const puzzleReset = document.getElementById('puzzleReset');
-        let puzzleTiles = [];
-        let puzzleSolved = false;
-
-        function initPuzzle() {
-            puzzleSolved = false;
-            puzzleMessage.classList.remove('show');
-            // Create tiles 1-8 + empty (null)
-            let tiles = [1,2,3,4,5,6,7,8,null];
-            // Shuffle (Fisher-Yates)
-            for (let i = tiles.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
-            }
-            // Ensure solvable (simple check - just reshuffle if already solved)
-            if (isPuzzleSolved(tiles)) {
-                [tiles[0], tiles[1]] = [tiles[1], tiles[0]];
-            }
-            puzzleTiles = tiles;
-            renderPuzzle();
-            puzzleStatus.textContent = 'رتب الأرقام من 1 لـ 8 🧩';
-        }
-
-        function isPuzzleSolved(tiles) {
-            for (let i = 0; i < 8; i++) {
-                if (tiles[i] !== i + 1) return false;
-            }
-            return tiles[8] === null;
-        }
-
-        function renderPuzzle() {
-            puzzleGrid.innerHTML = '';
-            for (let i = 0; i < 9; i++) {
-                const tile = document.createElement('div');
-                tile.className = 'puzzle-tile';
-                if (puzzleTiles[i] === null) {
-                    tile.classList.add('empty');
-                } else {
-                    const val = puzzleTiles[i];
-                    const emojis = ['🖤','💕','💖','💗','💓','💞','💝','👑'];
-                    tile.textContent = emojis[val - 1] || val;
-                    tile.dataset.value = val;
-                    tile.dataset.index = i;
-                    tile.addEventListener('click', () => puzzleClick(i));
-                }
-                puzzleGrid.appendChild(tile);
-            }
-        }
-
-        function puzzleClick(index) {
-            if (puzzleSolved) return;
-            const emptyIdx = puzzleTiles.indexOf(null);
-            // Check if adjacent (up/down/left/right in 3x3)
-            const row = Math.floor(index / 3);
-            const col = index % 3;
-            const erow = Math.floor(emptyIdx / 3);
-            const ecol = emptyIdx % 3;
-
-            if ((Math.abs(row - erow) === 1 && col === ecol) || (Math.abs(col - ecol) === 1 && row === erow)) {
-                [puzzleTiles[index], puzzleTiles[emptyIdx]] = [puzzleTiles[emptyIdx], puzzleTiles[index]];
-                renderPuzzle();
-
-                if (isPuzzleSolved(puzzleTiles)) {
-                    puzzleSolved = true;
-                    puzzleStatus.textContent = '🎉 ألف مبروك! حلّيت اللغز! 🎉';
-                    puzzleMessage.classList.add('show');
-                    // Burst celebration
-                    const rect = puzzleGrid.getBoundingClientRect();
-                    const cx = rect.left + rect.width / 2;
-                    const cy = rect.top + rect.height / 2;
-                    for (let b = 0; b < 5; b++) {
-                        setTimeout(() => {
-                            const allEmojis = ['❤️','🖤','👑','💕','💖','💗','💓','💞','💝','💘','🎉','🎊'];
-                            for (let k = 0; k < 15; k++) {
-                                const el = document.createElement('div');
-                                el.className = 'burst-heart';
-                                el.textContent = allEmojis[Math.floor(Math.random() * allEmojis.length)];
-                                el.style.left = cx + 'px'; el.style.top = cy + 'px';
-                                const angle = Math.random() * Math.PI * 2;
-                                const dist = 80 + Math.random() * 150;
-                                el.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
-                                el.style.setProperty('--ty', Math.sin(angle) * dist - 80 + 'px');
-                                el.style.setProperty('--tr', (Math.random() - 0.5) * 720 + 'deg');
-                                el.style.fontSize = (0.8 + Math.random() * 1.5) + 'rem';
-                                document.body.appendChild(el);
-                                setTimeout(() => el.remove(), 1200);
-                            }
-                        }, b * 200);
-                    }
-                }
-            }
-        }
-
-        puzzleReset.addEventListener('click', initPuzzle);
-        initPuzzle();
-
-        // ══════════════════════════════════════════════
-        // 10. ROSE
+        // 9. ROSE
         // ══════════════════════════════════════════════
         const roseContainer = document.getElementById('roseContainer');
         const roseStatus = document.getElementById('roseStatus');
