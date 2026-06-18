@@ -196,6 +196,79 @@
             50% { transform: translateY(-8px); }
         }
 
+        /* ── DISTANCE ── */
+        #distance {
+            text-align: center;
+            padding: 40px 20px;
+            margin: 20px 0;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(8px);
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        #distance .dist-title {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 15px rgba(0,0,0,0.2);
+        }
+
+        #distance .dist-cities {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            opacity: 0.85;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        #distance .dist-number {
+            font-size: clamp(2.2rem, 7vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            display: block;
+        }
+
+        #distance .dist-label {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        #distance .dist-line {
+            margin: 15px auto;
+            width: 80%;
+            max-width: 250px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            position: relative;
+        }
+
+        #distance .dist-line::before {
+            content: '🇶🇦';
+            position: absolute;
+            left: -5px;
+            top: -14px;
+            font-size: 1.3rem;
+        }
+
+        #distance .dist-line::after {
+            content: '🇮🇶';
+            position: absolute;
+            right: -5px;
+            top: -14px;
+            font-size: 1.3rem;
+        }
+
+        #distance .dist-message {
+            margin-top: 15px;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            opacity: 0.85;
+            font-style: italic;
+        }
+
         /* ── COUNTDOWN ── */
         #countdown {
             text-align: center;
@@ -704,6 +777,16 @@
             <div class="tiny-hearts">🖤 👑 🖤 👑 🖤</div>
         </section>
 
+        <!-- ─── DISTANCE ─── -->
+        <section id="distance">
+            <div class="dist-title">🗺️ المسافة بينّا</div>
+            <div class="dist-cities">الدوحة 🇶🇦  •  سامراء 🇮🇶</div>
+            <span class="dist-number" id="distKm">0</span>
+            <div class="dist-label">كيلو مانعنا عن بعض</div>
+            <div class="dist-line"></div>
+            <div class="dist-message">بس والله المسافة قدام حبنا ما بتسوى شي 💕</div>
+        </section>
+
         <!-- ─── COUNTDOWN ─── -->
         <section id="countdown">
             <div class="cd-title">💫 لشوف أميرتي الحلوة 💫</div>
@@ -961,7 +1044,23 @@
         setInterval(updateDateCounter, 1000 * 60 * 60); // update every hour
 
         // ──────────────────────────────────────────────
-        // 2.6 COUNTDOWN
+        // 2.6 DISTANCE
+        // ──────────────────────────────────────────────
+        function calcDistance() {
+            const toRad = (deg) => deg * Math.PI / 180;
+            const lat1 = 25.2854, lon1 = 51.5310; // Doha
+            const lat2 = 34.1959, lon2 = 43.8793; // Samarra
+            const R = 6371;
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+            const dist = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+            document.getElementById('distKm').textContent = dist.toLocaleString('en-US');
+        }
+        calcDistance();
+
+        // ──────────────────────────────────────────────
+        // 2.7 COUNTDOWN
         // ──────────────────────────────────────────────
         function updateCountdown() {
             const target = new Date('2026-10-01T00:00:00');
