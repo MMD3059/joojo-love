@@ -281,26 +281,38 @@
         .rose-container .petal {
             position: absolute; bottom: 50px; left: 50%; border-radius: 50% 0 50% 0;
             width: 40px; height: 40px; transform-origin: center;
-            transition: all 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
-            opacity: 0; transform: translate(-50%,0) scale(0) rotate(-45deg);
+            transition: all 0.6s cubic-bezier(0.68,-0.55,0.27,1.55);
+            opacity: 1; transform: translate(-50%,0) scale(0) rotate(-45deg);
         }
-        .rose-container .petal.open {
-            opacity: 1; transform: translate(-50%,0) scale(1) rotate(0deg);
+        .rose-container .petal.show {
+            transform: translate(-50%,0) scale(1) rotate(0deg);
         }
-        .rose-container .petal.p1 { background: #ff6b6b; }  /* outer */
-        .rose-container .petal.p2 { background: #ff4757; width: 36px; height: 36px; bottom: 54px; }
-        .rose-container .petal.p3 { background: #ff2d55; width: 32px; height: 32px; bottom: 56px; }
-        .rose-container .petal.p4 { background: #ff6b81; width: 28px; height: 28px; bottom: 58px; }
-        .rose-container .petal.p5 { background: #ff4757; width: 24px; height: 24px; bottom: 60px; }
-        .rose-container .petal.p6 { background: #ff2d55; width: 20px; height: 20px; bottom: 62px; }
-        .rose-container .petal.p7 { background: #ff6b6b; width: 16px; height: 16px; bottom: 64px; }
+        .rose-container .petal.pluck {
+            opacity: 0; transform: translate(calc(-50% + var(--px)), calc(var(--py))) scale(0.3) rotate(var(--pr));
+            transition: all 0.7s cubic-bezier(0.6,-0.28,0.74,0.05);
+        }
+        .rose-container .petal.p1 { background: #ff6b6b; }
+        .rose-container .petal.p2 { background: #ff4757; width: 38px; height: 38px; bottom: 52px; }
+        .rose-container .petal.p3 { background: #ff2d55; width: 35px; height: 35px; bottom: 54px; }
+        .rose-container .petal.p4 { background: #ff6b81; width: 32px; height: 32px; bottom: 56px; }
+        .rose-container .petal.p5 { background: #ff4757; width: 29px; height: 29px; bottom: 58px; }
+        .rose-container .petal.p6 { background: #ff2d55; width: 26px; height: 26px; bottom: 59px; }
+        .rose-container .petal.p7 { background: #ff6b6b; width: 23px; height: 23px; bottom: 60px; }
+        .rose-container .petal.p8 { background: #ff4757; width: 20px; height: 20px; bottom: 61px; }
+        .rose-container .petal.p9 { background: #ff2d55; width: 17px; height: 17px; bottom: 62px; }
+        .rose-container .petal.p10 { background: #ff6b81; width: 14px; height: 14px; bottom: 63px; }
         .rose-container .bloom-message {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
             font-size: 2.5rem; opacity: 0; transition: opacity 0.5s ease; z-index: 5;
+            pointer-events: none;
         }
         .rose-container .bloom-message.show { opacity: 1; }
-
         .rose-status { font-size: 1rem; opacity: 0.85; margin-bottom: 8px; }
+        .qtf-text {
+            font-size: clamp(1.5rem,5vw,2.2rem); font-weight: 900; min-height: 2em;
+            margin: 10px 0; transition: all 0.3s ease;
+            text-shadow: 0 2px 15px rgba(0,0,0,0.2);
+        }
         .rose-msg {
             font-size: 1.15rem; font-weight: 600; min-height: 2em;
             opacity: 0; transition: opacity 0.5s ease;
@@ -437,7 +449,7 @@
         <!-- ─── ROSE ─── -->
         <section id="rose" class="reveal">
             <div class="rose-title reveal reveal-delay-1">🌹 قطفي وردة 🌹</div>
-            <div class="rose-status reveal reveal-delay-2" id="roseStatus">اضغط عالوردة عشان تفتح 🌷</div>
+            <div class="rose-status reveal reveal-delay-2" id="roseStatus">🌹 اضغط عالبتلة عشان تشوف</div>
             <div class="rose-container" id="roseContainer">
                 <div class="stem"></div>
                 <div class="petal p1"></div>
@@ -447,8 +459,11 @@
                 <div class="petal p5"></div>
                 <div class="petal p6"></div>
                 <div class="petal p7"></div>
-                <div class="bloom-message" id="bloomMsg">💕</div>
+                <div class="petal p8"></div>
+                <div class="petal p9"></div>
+                <div class="petal p10"></div>
             </div>
+            <div class="qtf-text" id="qtfText"></div>
             <div class="rose-msg" id="roseMessage">🌹 أنتِ أزكى وردة في حياتي</div>
         </section>
 
@@ -867,47 +882,65 @@
         const roseContainer = document.getElementById('roseContainer');
         const roseStatus = document.getElementById('roseStatus');
         const roseMessage = document.getElementById('roseMessage');
-        const bloomMsg = document.getElementById('bloomMsg');
+        const qtfText = document.getElementById('qtfText');
         let petalCount = 0;
-        const TOTAL_PETALS = 7;
+        const TOTAL_PETALS = 10;
+
+        const loveMsgs = ['تحبني 💕', 'ما تحبني 💔'];
+
+        // Show all petals on load
+        document.querySelectorAll('.petal').forEach(p => p.classList.add('show'));
 
         roseContainer.addEventListener('click', function() {
             if (petalCount >= TOTAL_PETALS) return;
 
             const petals = this.querySelectorAll('.petal');
-            petals[petalCount].classList.add('open');
-            petalCount++;
+            const p = petals[petalCount];
 
-            const remaining = TOTAL_PETALS - petalCount;
+            // Random pluck direction
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 80 + Math.random() * 100;
+            p.style.setProperty('--px', Math.cos(angle) * dist + 'px');
+            p.style.setProperty('--py', Math.sin(angle) * dist - 60 + 'px');
+            p.style.setProperty('--pr', (Math.random() - 0.5) * 540 + 'deg');
+            p.classList.add('pluck');
+
+            const remaining = TOTAL_PETALS - petalCount - 1;
             if (remaining > 0) {
-                roseStatus.textContent = `🌷 متبقي ${remaining} بتلات لفتح الوردة كاملة`;
+                const msgIdx = petalCount % 2;
+                qtfText.textContent = loveMsgs[msgIdx];
+                qtfText.style.color = msgIdx === 0 ? '#ff4757' : '#666';
+                roseStatus.textContent = `🌹 متبقي ${remaining} بتلات`;
             } else {
-                roseStatus.textContent = '🌸 الوردة تفتحت كاملة!';
+                qtfText.textContent = 'تحبني 💕❤️';
+                qtfText.style.color = '#ff4757';
+                roseStatus.textContent = '🌹 خلصت الوردة... أنتِ حبي 🥹❤️';
                 roseMessage.classList.add('show');
-                bloomMsg.classList.add('show');
                 // Celebration
                 const rect = this.getBoundingClientRect();
                 const cx = rect.left + rect.width / 2;
                 const cy = rect.top + rect.height / 2;
-                for (let b = 0; b < 3; b++) {
+                for (let b = 0; b < 5; b++) {
                     setTimeout(() => {
-                        for (let k = 0; k < 20; k++) {
+                        for (let k = 0; k < 25; k++) {
                             const el = document.createElement('div');
                             el.className = 'burst-heart';
-                            el.textContent = ['🌸','🌹','💕','💖','🖤','🌷'][Math.floor(Math.random() * 6)];
+                            el.textContent = ['❤️','💕','💖','🖤','👑','💗','💓','💞'][Math.floor(Math.random() * 8)];
                             el.style.left = cx + 'px'; el.style.top = cy + 'px';
                             const angle = Math.random() * Math.PI * 2;
-                            const dist = 60 + Math.random() * 150;
+                            const dist = 80 + Math.random() * 200;
                             el.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
-                            el.style.setProperty('--ty', Math.sin(angle) * dist - 80 + 'px');
+                            el.style.setProperty('--ty', Math.sin(angle) * dist - 100 + 'px');
                             el.style.setProperty('--tr', (Math.random() - 0.5) * 720 + 'deg');
-                            el.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+                            el.style.fontSize = (0.8 + Math.random() * 1.5) + 'rem';
                             document.body.appendChild(el);
                             setTimeout(() => el.remove(), 1200);
                         }
-                    }, b * 300);
+                    }, b * 250);
                 }
             }
+
+            petalCount++;
         });
 
         // ══════════════════════════════════════════════
